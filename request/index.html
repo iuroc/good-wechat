@@ -46,7 +46,7 @@
         const xhr = new XMLHttpRequest()
         function send() {
             const send_data = ele_send_data.value
-            xhr.open('POST', 'wechat.php')
+            xhr.open('POST', '../wechat.php')
             xhr.send(send_data)
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {

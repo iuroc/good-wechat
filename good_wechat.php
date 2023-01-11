@@ -21,15 +21,19 @@ class Good_wechat
     public array $mysql_config;
     /** 数据库连接 */
     public mysqli $conn;
-    public function __construct()
+    /**
+     * @param string $config_path 配置文件路径，默认为当前文件夹下 config.json
+     */
+    public function __construct(...$config_path)
     {
-        $this->load_config();
+        $this->load_config($config_path);
         $this->init_db();
     }
     /** 载入配置信息 */
-    public function load_config()
+    public function load_config($config_path)
     {
-        $this->config = json_decode(file_get_contents('config.json'), true);
+        $path = $config_path[0] ?? 'config.json';
+        $this->config = json_decode(file_get_contents($path), true);
         $this->mysql_config = $this->config['mysql'];
     }
     /** 初始化数据库 */
