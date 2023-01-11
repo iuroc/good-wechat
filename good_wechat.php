@@ -30,7 +30,7 @@ class Good_wechat
         $this->init_db();
     }
     /** 载入配置信息 */
-    public function load_config($config_path)
+    public function load_config(array $config_path)
     {
         $path = $config_path[0] ?? 'config.json';
         $this->config = json_decode(file_get_contents($path), true);
@@ -105,7 +105,7 @@ class Good_wechat
     /** 处理输出文本，去除首尾空白，去除每行开头空白
      * @param string $out_text 待发送内容
      */
-    private function parse_out($out_text)
+    public function parse_out($out_text)
     {
         $new_text = preg_replace('/^[ \t]+/m', '', $out_text);
         $new_text = trim($new_text);

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人控制台</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/bootstrap/5.2.3/css/bootstrap.min.css">
+    <script src="tool.js"></script>
+</head>
+
+<body>
+    <div class="container py-4">
+        <h4 class="mb-3">机器人控制台</h4>
+        <ul class="nav mb-3">
+            <li class="nav-item">
+                <a class="nav-link active" href="#">关键词回复</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#/about">关于</a>
+            </li>
+        </ul>
+        <div class="poncon-home poncon-page" style="display: none;">
+            <button class="btn btn-primary mb-3">新增关键词</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>关键词</th>
+                        <th>回复内容</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="poncon-about poncon-page" style="display: none;">
+            Github：<a href="https://github.com/oyps/good-wechat">https://github.com/oyps/good-wechat</a>
+        </div>
+    </div>
+    <script>
+        const poncon = new Poncon()
+        poncon.setPageList(['home', 'about'])
+        const pageData = {
+            home: {
+                load: false,
+                loadData(dom) {
+                    Ajax({
+                        url: 'get_keyword_list.php',
+                        success(data) {
+                            dom.querySelector('tbody').innerHTML = data
+                        }
+                    })
+                    this.load = true
+                }
+            }
+        }
+        poncon.setPage('home', function (target, dom) {
+            if (!pageData.home.load) {
+                pageData.home.loadData(dom)
+            }
+        })
+        poncon.start()
+    </script>
+</body>
+
+</html>
