@@ -30,8 +30,7 @@ class Update
             return false;
         }
         $table_keyword = $this->wechat->mysql_config['table']['keyword'];
-        // $keyword = mysqli_real_escape_string($this->wechat->conn, $this->keyword);
-        $sql = "SELECT * FROM `$table_keyword` WHERE `id` = '{$this->id}'";
+        $sql = "SELECT * FROM `$table_keyword` WHERE `id` = {$this->id}";
         $result = mysqli_query($this->wechat->conn, $sql);
         return mysqli_num_rows($result) > 0;
     }
@@ -41,7 +40,7 @@ class Update
         $table_keyword = $this->wechat->mysql_config['table']['keyword'];
         $keyword = mysqli_real_escape_string($this->wechat->conn, $this->keyword);
         $reply = mysqli_real_escape_string($this->wechat->conn, $this->reply);
-        $sql = "UPDATE `$table_keyword` SET `keyword` = '$keyword', `reply` = '$reply' WHERE `id` = '{$this->id}'";
+        $sql = "UPDATE `$table_keyword` SET `keyword` = '$keyword', `reply` = '$reply' WHERE `id` = {$this->id}";
         if (mysqli_query($this->wechat->conn, $sql)) {
             echo '替换完成';
         }

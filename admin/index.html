@@ -56,7 +56,7 @@
                         success(data) {
                             dom.querySelector('tbody').innerHTML = data
                             dom.querySelector('table').style.display = 'revert'
-                            const eles = dom.querySelectorAll('td')
+                            const eles = dom.querySelectorAll('td[contenteditable]')
                             eles.forEach(element => {
                                 element.addEventListener('keydown', function (event) {
                                     if (event.keyCode == 13 && !event.shiftKey) {
@@ -73,7 +73,7 @@
                                             const keyword = ele_keyword.innerHTML
                                             const reply = ele_reply.innerHTML
                                             Ajax({
-                                                url: 'update.php',
+                                                url: 'update_keyword.php',
                                                 method: 'POST',
                                                 headers: {
                                                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -88,6 +88,30 @@
                                                 }
                                             })
                                         }
+                                    }
+                                })
+                            })
+                            const eles_delete = dom.querySelectorAll('td.delete')
+                            eles_delete.forEach(element => {
+                                element.addEventListener('click', function (event) {
+                                    const ele_self = event.target
+                                    const ele_parent = ele_self.parentNode
+                                    const id = ele_self.getAttribute('data-id')
+                                    if (confirm('确定要删除该条记录？')) {
+                                        Ajax({
+                                            url: 'delete_keyword.php',
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/x-www-form-urlencoded'
+                                            },
+                                            content: 'id=' + id,
+                                            success(data) {
+                                                if (!data) {
+                                                    alert('删除失败')
+                                                }
+                                                ele_parent.remove()
+                                            }
+                                        })
                                     }
                                 })
                             })

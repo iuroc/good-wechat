@@ -35,6 +35,7 @@ class Get_keyword_list
             <tr>
                 <td contenteditable="true" class="keyword" data-id="' . $item['id'] . '">' . $item['keyword'] . '</td>
                 <td contenteditable="true" class="reply" data-id="' . $item['id'] . '">' . $item['reply'] . '</td>
+                <td class="text-nowrap text-danger user-select-none delete" role="button" data-id="' . $item['id'] . '">删除</td>
             </tr>';
         }
         return $this->wechat->parse_out($html);
