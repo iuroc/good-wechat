@@ -8,6 +8,13 @@
     <title>机器人控制台</title>
     <link rel="stylesheet" href="https://cdn.staticfile.org/bootstrap/5.2.3/css/bootstrap.min.css">
     <script src="tool.js"></script>
+    <style>
+        .poncon-home td {
+            width: 50%;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+    </style>
 </head>
 
 <body>
@@ -23,7 +30,7 @@
         </ul>
         <div class="poncon-home poncon-page" style="display: none;">
             <button class="btn btn-primary mb-3">新增关键词</button>
-            <table class="table">
+            <table class="table" style="display: none;">
                 <thead>
                     <tr>
                         <th>关键词</th>
@@ -48,6 +55,42 @@
                         url: 'get_keyword_list.php',
                         success(data) {
                             dom.querySelector('tbody').innerHTML = data
+                            dom.querySelector('table').style.display = 'revert'
+                            const eles = dom.querySelectorAll('td')
+                            eles.forEach(element => {
+                                element.addEventListener('keydown', function (event) {
+                                    if (event.keyCode == 13 && !event.shiftKey) {
+                                        event.preventDefault()
+                                    }
+                                })
+                                element.addEventListener('keyup', function (event) {
+                                    if (event.keyCode == 13 && !event.shiftKey) {
+                                        if (confirm('确定要修改这个记录？')) {
+                                            const ele_self = event.target
+                                            const id = ele_self.getAttribute('data-id')
+                                            const ele_keyword = document.querySelector('td.keyword[data-id="' + id + '"]')
+                                            const ele_reply = document.querySelector('td.reply[data-id="' + id + '"]')
+                                            const keyword = ele_keyword.innerHTML
+                                            const reply = ele_reply.innerHTML
+                                            Ajax({
+                                                url: 'update.php',
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                                },
+                                                content: 'keyword=' + encodeURIComponent(keyword)
+                                                    + '&reply=' + encodeURIComponent(reply)
+                                                    + '&id=' + id,
+                                                success(data) {
+                                                    if (!data) {
+                                                        alert('修改失败')
+                                                    }
+                                                }
+                                            })
+                                        }
+                                    }
+                                })
+                            })
                         }
                     })
                     this.load = true

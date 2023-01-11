@@ -48,8 +48,8 @@ class Good_wechat
         $table_keyword = $this->mysql_config['table']['keyword'];
         mysqli_query($this->conn, "CREATE TABLE IF NOT EXISTS `$table_keyword` (
             `id` INT NOT NULL AUTO_INCREMENT,
-            `keyword` VARCHAR(255),
-            `replay` VARCHAR(255),
+            `keyword` VARCHAR(255) NOT NULL,
+            `reply` VARCHAR(255) NOT NULL,
             PRIMARY KEY (`id`)
         )");
     }
@@ -66,11 +66,11 @@ class Good_wechat
     {
         $table_keyword = $this->mysql_config['table']['keyword'];
         $keyword = mysqli_real_escape_string($this->conn, $this->content);
-        $sql = "SELECT `replay` FROM `$table_keyword` WHERE `keyword` = '$keyword'";
+        $sql = "SELECT `reply` FROM `$table_keyword` WHERE `keyword` = '$keyword'";
         $result = mysqli_query($this->conn, $sql);
         if (mysqli_num_rows($result) == 1) {
-            $replay = mysqli_fetch_assoc($result)['replay'];
-            $this->send_text($replay);
+            $reply = mysqli_fetch_assoc($result)['reply'];
+            $this->send_text($reply);
         }
     }
     /** 获取并解析输入数据 */

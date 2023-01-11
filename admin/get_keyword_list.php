@@ -33,9 +33,9 @@ class Get_keyword_list
         foreach ($data as $item) {
             $html .= '
             <tr>
-                <td contenteditable="true" class="keyword">' . $item['keyword'] . '</td>
-                <td contenteditable="true" class="reply">' . $item['replay'] . '</td>
-            <tr>';
+                <td contenteditable="true" class="keyword" data-id="' . $item['id'] . '">' . $item['keyword'] . '</td>
+                <td contenteditable="true" class="reply" data-id="' . $item['id'] . '">' . $item['reply'] . '</td>
+            </tr>';
         }
         return $this->wechat->parse_out($html);
     }
