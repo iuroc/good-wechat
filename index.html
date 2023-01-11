@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信公众号模拟发送消息</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/bootstrap/5.2.3/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/codemirror/5.40.2/codemirror.min.js"></script>
+    <style>
+        textarea {
+            font-family: Consolas !important;
+            font-size: 20px !important;
+            height: 400px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-4">
+        <div class="d-flex mb-4">
+            <h3 class="me-auto mb-0">微信公众号模拟发送消息</h3>
+            <div>
+                <button class="btn btn-success me-2" onclick="send()">发送消息</button>
+                <button class="btn btn-secondary" onclick="reset()">重置数据</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-floating shadow-sm">
+                    <textarea class="form-control" placeholder="发送数据（XML）" id="send_data"></textarea>
+                    <label>要发送的数据</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating shadow-sm">
+                    <textarea class="form-control" placeholder="接受数据（XML）" id="response_data"></textarea>
+                    <label>接收到的数据</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const ele_send_data = document.querySelector('#send_data')
+        const ele_response_data = document.querySelector('#response_data')
+        const xhr = new XMLHttpRequest()
+        function send() {
+            const send_data = ele_send_data.value
+            xhr.open('POST', 'wechat.php')
+            xhr.send(send_data)
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    ele_response_data.value = xhr.responseText
+                }
+            }
+        }
+        function reset() {
+            ele_send_data.value = `<xml>
+    <ToUserName><![CDATA[toUser]]></ToUserName>
+    <FromUserName><![CDATA[fromUser]]></FromUserName>
+    <CreateTime>1348831860</CreateTime>
+    <MsgType><![CDATA[text]]></MsgType>
+    <Content><![CDATA[this is a test]]></Content>
+    <MsgId>1234567890123456</MsgId>
+    <MsgDataId>xxxx</MsgDataId>
+    <Idx>xxxx</Idx>
+</xml>`
+        }
+        reset()
+    </script>
+</body>
+
+</html>
