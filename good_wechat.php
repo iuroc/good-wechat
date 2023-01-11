@@ -7,12 +7,14 @@ class Good_wechat
 {
     /** 解析后的输入数据 */
     public array $input_data;
-    /** 收件人 */
+    /** 接收到的收件人 */
     public string $to_user_name;
-    /** 发件人 */
+    /** 接收到的发件人 */
     public string $from_user_name;
-    /** 消息类型 */
+    /** 接收到的消息类型 */
     public string $msg_type;
+    /** 接收到的消息内容 */
+    public string $content;
     /** 配置信息 */
     public array $config;
     /** MySQL 配置信息 */
@@ -22,23 +24,38 @@ class Good_wechat
     public function __construct()
     {
         $this->load_config();
+        $this->init_db();
     }
     /** 载入配置信息 */
     public function load_config()
     {
         $this->config = json_decode(file_get_contents('config.json'), true);
         $this->mysql_config = $this->config['mysql'];
+    }
+    /** 初始化数据库 */
+    public function init_db()
+    {
         $this->conn = mysqli_connect(
             $this->mysql_config['host'],
             $this->mysql_config['username'],
             $this->mysql_config['password'],
             $this->mysql_config['database']
         );
+        // mysqli_query($this->conn, '');
     }
     /** 开启机器人 */
     public function start()
     {
         $this->load_input_data();
+        $this->match_keyword();
+    }
+    /**
+     * 匹配关键词并回复
+     */
+    public function match_keyword()
+    {
+        $keyword = mysqli_real_escape_string($this->conn, $this->content);
+        $this->send_text('你刚刚发送了：' . $keyword);
     }
     /** 获取并解析输入数据 */
     private function load_input_data()
@@ -51,6 +68,7 @@ class Good_wechat
         $this->to_user_name = $this->input_data['ToUserName'];
         $this->from_user_name = $this->input_data['FromUserName'];
         $this->msg_type = $this->input_data['MsgType'];
+        $this->content = $this->input_data['Content'];
     }
     /** 发送文本数据，注意本方法只能调用一次
      * @param string $text 待发送内容
@@ -66,6 +84,7 @@ class Good_wechat
             <Content><![CDATA[' . $this->parse_out($text) . ']]></Content>
         </xml>');
         echo $out_text;
+        die();
     }
     /** 处理输出文本，去除首尾空白，去除每行开头空白
      * @param string $out_text 待发送内容
