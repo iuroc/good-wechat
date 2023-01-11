@@ -26,7 +26,11 @@
 
 #### `send_text`
 
-发送字符串内容
-
+- 说明：发送字符串内容
 - 参数
   - `text`：待发送内容，字符串类型
+- 示例
+    ```
+    $wechat = new Good_wechat();
+    $wechat->send_text('你好');
+    ```
