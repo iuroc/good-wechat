@@ -1,4 +1,5 @@
+@REM ä¸€é”®æäº¤ Git è„šæœ¬
 git add .
-set /p message=ÇëÊäÈëÏûÏ¢£º
+set /p message=Please Input Message: 
 git commit -m %message%
 git push
