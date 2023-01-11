@@ -41,7 +41,13 @@ class Good_wechat
             $this->mysql_config['password'],
             $this->mysql_config['database']
         );
-        // mysqli_query($this->conn, '');
+        $table_keyword = $this->mysql_config['table']['keyword'];
+        mysqli_query($this->conn, "CREATE TABLE IF NOT EXISTS `$table_keyword` (
+            `id` INT NOT NULL AUTO_INCREMENT,
+            `keyword` VARCHAR(255),
+            `replay` VARCHAR(255),
+            PRIMARY KEY (`id`)
+        )");
     }
     /** 开启机器人 */
     public function start()
@@ -54,8 +60,14 @@ class Good_wechat
      */
     public function match_keyword()
     {
+        $table_keyword = $this->mysql_config['table']['keyword'];
         $keyword = mysqli_real_escape_string($this->conn, $this->content);
-        $this->send_text('你刚刚发送了：' . $keyword);
+        $sql = "SELECT `replay` FROM `$table_keyword` WHERE `keyword` = '$keyword'";
+        $result = mysqli_query($this->conn, $sql);
+        if (mysqli_num_rows($result) == 1) {
+            $replay = mysqli_fetch_assoc($result)['replay'];
+            $this->send_text($replay);
+        }
     }
     /** 获取并解析输入数据 */
     private function load_input_data()
@@ -91,7 +103,7 @@ class Good_wechat
      */
     private function parse_out($out_text)
     {
-        $new_text = preg_replace('/^\s+/m', '', $out_text);
+        $new_text = preg_replace('/^[ \t]+/m', '', $out_text);
         $new_text = trim($new_text);
         return $new_text;
     }
