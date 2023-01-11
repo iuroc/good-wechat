@@ -1,57 +1,11 @@
 <?php
 
-/** Good-Wechat 微信公众号机器人
- * @author 欧阳鹏
+/**
+ * 机器人主程序
  */
-class Good_wechat
-{
-    /** 解析后的输入数据 */
-    public array $input_data;
-    /** 收件人 */
-    public string $to_user_name;
-    /** 发件人 */
-    public string $from_user_name;
-    /** 消息类型 */
-    public string $msg_type;
-    public function __construct()
-    {
-        $this->load_input_data();
-    }
-    /** 获取并解析输入数据 */
-    private function load_input_data()
-    {
-        $input_text = file_get_contents('php://input');
-        if (!$input_text) {
-            die('输入为空');
-        }
-        $this->input_data = (array)simplexml_load_string($input_text, null, LIBXML_NOCDATA);
-        $this->to_user_name = $this->input_data['ToUserName'];
-        $this->from_user_name = $this->input_data['FromUserName'];
-        $this->msg_type = $this->input_data['MsgType'];
-    }
-    /** 发送文本数据，注意本方法只能调用一次
-     * @param string $text 待发送内容
-     */
-    public function send_text(string $text)
-    {
-        $out_text = $this->parse_out('
-        <xml>
-            <ToUserName><![CDATA[' . $this->from_user_name . ']]></ToUserName>
-            <FromUserName><![CDATA[' . $this->to_user_name . ']]></FromUserName>
-            <CreateTime>' . time() . '</CreateTime>
-            <MsgType><![CDATA[text]]></MsgType>
-            <Content><![CDATA[' . $this->parse_out($text) . ']]></Content>
-        </xml>');
-        echo $out_text;
-    }
-    /** 处理输出文本，去除首尾空白，去除每行开头空白
-     * @param string $out_text 待发送内容
-     */
-    private function parse_out($out_text)
-    {
-        $new_text = preg_replace('/^\s+/m', '', $out_text);
-        $new_text = trim($new_text);
-        return $new_text;
-    }
-}
+
+require('./good_wechat.php');
+
 $wechat = new Good_wechat();
+$wechat->start();
+$wechat->send_text('机器人测试开始啦');

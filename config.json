@@ -1,0 +1,11 @@
+{
+    "mysql": {
+        "host": "localhost",
+        "username": "root",
+        "password": "12345678",
+        "database": "ponconsoft",
+        "table": {
+            "keyword": "gw_keyword"
+        }
+    }
+}

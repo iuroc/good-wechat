@@ -20,17 +20,24 @@
 - [消息加解密说明](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Message_encryption_and_decryption_instructions.html)
 - [群发接口和原创校验](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html)
 
+## 开始
+
+- 修改 `config.json` 中的配置信息
+- 导入 `good_wechat.php`
+- 程序开始
+  ```php
+  <?php
+
+  require('./good_wechat.php');
+
+  $wechat = new Good_wechat();
+  $wechat->start();
+  $wechat->send_text('机器人测试开始啦');
+  ```
+
 ## API 文档
 
 ### 方法
 
-#### `send_text`
-
-- 说明：发送字符串内容
-- 参数
-  - `text`：待发送内容，字符串类型
-- 示例
-    ```
-    $wechat = new Good_wechat();
-    $wechat->send_text('你好');
-    ```
+- send_text(string $text)
+  - 发送文本消息
