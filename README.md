@@ -20,20 +20,12 @@
 - [消息加解密说明](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Message_encryption_and_decryption_instructions.html)
 - [群发接口和原创校验](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html)
 
-## 开始
+## 部署方法
 
+- 克隆仓库
 - 修改 `config.json` 中的配置信息
-- 导入 `good_wechat.php`
-- 程序开始
-  ```php
-  <?php
-
-  require('./good_wechat.php');
-
-  $wechat = new Good_wechat();
-  $wechat->start();
-  $wechat->send_text('机器人测试开始啦');
-  ```
+- 访问 `/request/index.html` 可以调试机器人
+- 
 
 ## API 文档
 

@@ -33,8 +33,8 @@ class Get_keyword_list
         foreach ($data as $item) {
             $html .= '
             <tr>
-                <td contenteditable="true" class="keyword" data-id="' . $item['id'] . '">' . $item['keyword'] . '</td>
-                <td contenteditable="true" class="reply" data-id="' . $item['id'] . '">' . $item['reply'] . '</td>
+                <td contenteditable="true" class="keyword" data-id="' . $item['id'] . '">' . htmlspecialchars($item['keyword']) . '</td>
+                <td contenteditable="true" class="reply" data-id="' . $item['id'] . '">' . htmlspecialchars($item['reply']) . '</td>
                 <td class="text-nowrap text-danger user-select-none delete" role="button" data-id="' . $item['id'] . '">删除</td>
             </tr>';
         }
