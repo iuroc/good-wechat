@@ -1,0 +1,12 @@
+{
+    "name": "admin",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc && browserify js/index.js -o js/bundle.js && uglifyjs js/bundle.js -m -c -o js/bundle.min.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}

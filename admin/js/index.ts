@@ -1,18 +1,24 @@
+import Ajax from './ajax'
+import Poncon from './poncon'
 const poncon = new Poncon()
 poncon.setPageList(['home', 'about'])
 const pageData = {
     home: {
         load: false,
-        loadData(dom) {
-            Ajax({
+        loadData(dom: HTMLElement) {
+            new Ajax({
                 url: 'get_keyword_list.php',
                 success(data) {
-                    this.load = true
-                    dom.querySelector('tbody').innerHTML = data
-                    dom.querySelector('table').style.display = 'revert'
-                    const eles = dom.querySelectorAll('td[contenteditable]')
+                    pageData.home.load = true
+                    const ele_tbody = dom.querySelector('tbody') as HTMLTableSectionElement
+                    const ele_table = dom.querySelector('table') as HTMLTableElement
+                    if (ele_table && ele_tbody && data) {
+                        ele_tbody.innerHTML = data
+                        ele_table.style.display = 'revert'
+                    }
+                    const eles = dom.querySelectorAll<HTMLTableCellElement>('td[contenteditable]')
                     eles.forEach(element => {
-                        element.addEventListener('keydown', function (event) {
+                        element.addEventListener('keydown', function (event: KeyboardEvent) {
                             if (event.keyCode == 13 && !event.shiftKey) {
                                 event.preventDefault()
                             }
@@ -20,13 +26,13 @@ const pageData = {
                         element.addEventListener('keyup', function (event) {
                             if (event.keyCode == 13 && !event.shiftKey) {
                                 if (confirm('确定要修改这个记录？')) {
-                                    const ele_self = event.target
+                                    const ele_self = event.target as HTMLDivElement
                                     const id = ele_self.getAttribute('data-id')
-                                    const ele_keyword = document.querySelector('td.keyword[data-id="' + id + '"]')
-                                    const ele_reply = document.querySelector('td.reply[data-id="' + id + '"]')
+                                    const ele_keyword = document.querySelector('td.keyword[data-id="' + id + '"]') as HTMLTableCellElement
+                                    const ele_reply = document.querySelector('td.reply[data-id="' + id + '"]') as HTMLTableCellElement
                                     const keyword = ele_keyword.innerText
                                     const reply = ele_reply.innerText
-                                    Ajax({
+                                    new Ajax({
                                         url: 'update_keyword.php',
                                         method: 'POST',
                                         headers: {
@@ -45,14 +51,14 @@ const pageData = {
                             }
                         })
                     })
-                    const eles_delete = dom.querySelectorAll('td.delete')
+                    const eles_delete = dom.querySelectorAll<HTMLDivElement>('td.delete')
                     eles_delete.forEach(element => {
-                        element.addEventListener('click', function (event) {
-                            const ele_self = event.target
+                        element.addEventListener('click', function (event: Event) {
+                            const ele_self = event.target as Node
                             const ele_parent = ele_self.parentNode
-                            const id = ele_self.getAttribute('data-id')
+                            const id = (ele_self as HTMLElement).getAttribute('data-id')
                             if (confirm('确定要删除该条记录？')) {
-                                Ajax({
+                                new Ajax({
                                     url: 'delete_keyword.php',
                                     method: 'POST',
                                     headers: {
@@ -63,7 +69,7 @@ const pageData = {
                                         if (!data) {
                                             alert('删除失败')
                                         }
-                                        ele_parent.remove()
+                                        (ele_parent as HTMLElement).remove()
                                     }
                                 })
                             }
@@ -71,27 +77,27 @@ const pageData = {
                     })
                 }
             })
-            const ele_addKeyword = dom.querySelector('.addKeyword')
+            const ele_addKeyword = dom.querySelector('.addKeyword') as HTMLButtonElement
             ele_addKeyword.addEventListener('click', function () {
-                const ele_firstLineDelete = dom.querySelector('.delete')
+                const ele_firstLineDelete = dom.querySelector('.delete') as HTMLButtonElement
                 if (!ele_firstLineDelete.getAttribute('data-id')) {
                     return
                 }
-                const ele_tbody = dom.querySelector('tbody')
+                const ele_tbody = dom.querySelector('tbody') as HTMLTableSectionElement
                 const newEle = document.createElement('tr')
                 newEle.innerHTML = `
                 <td contenteditable="true" class="keyword"></td>
                 <td contenteditable="true" class="reply"></td>
                 <td class="text-nowrap text-danger user-select-none delete" role="button">删除</td>`
-                ele_tbody.insertBefore(newEle, ele_tbody.children[0])
-                newEle.querySelector('td').focus()
+                ele_tbody.insertBefore(newEle, ele_tbody.children[0]);
+                (newEle.querySelector('td') as HTMLTableCellElement).focus()
             })
         }
     }
 }
 poncon.setPage('home', function (target, dom) {
     if (!pageData.home.load) {
-        pageData.home.loadData(dom)
+        pageData.home.loadData(dom as HTMLElement)
     }
 })
 poncon.start()
