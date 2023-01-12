@@ -25,7 +25,8 @@
 - 克隆仓库
 - 修改 `config.json` 中的配置信息
 - 访问 `/request/index.html` 可以调试机器人
-- 访问 `/admin/index.html` 机器人控制面板
+- 访问 `/admin/index.html` 打开机器人控制面板
+- 将 `wechat.php` 的公网访问地址配置到微信公众号后台即可接入
 
 ## API 文档
 
@@ -33,3 +34,16 @@
 
 - send_text(string $text)
   - 发送文本消息
+- start()
+  - 开启机器人，在实例化 `Good_wechat` 类后调用
+- add_rule(string $pattern, callable $callback)
+  - 说明：增加自定义规则
+  - 参数
+    - $pattern 正则表达式，用于匹配用户发送的指令类型（用空格分割后的第一项）
+    - $callback 回调函数，如果需要发送消息，需要使用 `return` 直接返回消息，add_rule 方法将自动发送消息
+  - 示例
+    ```php
+    $wechat->add_rule('/.*?music.*?/', function ($args) {
+        return '你输入的内容包含了 music 哦';
+    });
+    ```

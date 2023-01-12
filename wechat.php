@@ -8,6 +8,9 @@ require('./good_wechat.php');
 
 $wechat = new Good_wechat();
 $wechat->start();
+$wechat->add_rule('/.*?music.*?/', function ($args) {
+    return '你输入的内容包含了 music 哦';
+});
 // $wechat->send_text('你刚刚发送的“' . $wechat->content . '”暂时没有答案哦');
 $wechat->send_text('系统升级中，敬请谅解
 

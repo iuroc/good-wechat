@@ -85,6 +85,9 @@ class Good_wechat
         $this->from_user_name = $this->input_data['FromUserName'];
         $this->msg_type = $this->input_data['MsgType'];
         $this->content = $this->input_data['Content'];
+        if (!$this->content) {
+            $this->send_text('亲，请输入内容哦');
+        }
     }
     /** 发送文本数据，注意本方法只能调用一次
      * @param string $text 待发送内容
@@ -110,5 +113,20 @@ class Good_wechat
         $new_text = preg_replace('/^[ \t]+/m', '', $out_text);
         $new_text = trim($new_text);
         return $new_text;
+    }
+    /**
+     * 增加规则
+     * @param string $pattern 正则规则
+     * @param callable $callback 回调函数，返回需要发送的内容
+     */
+    public function add_rule(string $pattern, callable $callback)
+    {
+        $args = preg_split('/\s+/', $this->content);
+        if (preg_match($pattern, $args[0] ?? '')) {
+            $callback_text = call_user_func($callback, $args);
+            if ($callback_text) {
+                $this->send_text($callback_text);
+            }
+        }
     }
 }
