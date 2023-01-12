@@ -25,7 +25,7 @@
 - 克隆仓库
 - 修改 `config.json` 中的配置信息
 - 访问 `/request/index.html` 可以调试机器人
-- 
+- 访问 `/admin/index.html` 机器人控制面板
 
 ## API 文档
 
