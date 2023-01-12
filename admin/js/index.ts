@@ -14,8 +14,8 @@ const pageData = {
                     const ele_table = dom.querySelector('table') as HTMLTableElement
                     if (ele_table && ele_tbody && data) {
                         ele_tbody.innerHTML = data
-                        ele_table.style.display = 'revert'
                     }
+                    ele_table.style.display = 'revert'
                     const eles = dom.querySelectorAll<HTMLTableCellElement>('td[contenteditable]')
                     eles.forEach(element => {
                         element.addEventListener('keydown', function (event: KeyboardEvent) {
@@ -25,29 +25,7 @@ const pageData = {
                         })
                         element.addEventListener('keyup', function (event) {
                             if (event.keyCode == 13 && !event.shiftKey) {
-                                if (confirm('确定要修改这个记录？')) {
-                                    const ele_self = event.target as HTMLDivElement
-                                    const id = ele_self.getAttribute('data-id')
-                                    const ele_keyword = document.querySelector('td.keyword[data-id="' + id + '"]') as HTMLTableCellElement
-                                    const ele_reply = document.querySelector('td.reply[data-id="' + id + '"]') as HTMLTableCellElement
-                                    const keyword = ele_keyword.innerText
-                                    const reply = ele_reply.innerText
-                                    new Ajax({
-                                        url: 'update_keyword.php',
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/x-www-form-urlencoded'
-                                        },
-                                        content: 'keyword=' + encodeURIComponent(keyword)
-                                            + '&reply=' + encodeURIComponent(reply)
-                                            + '&id=' + id,
-                                        success(data) {
-                                            if (!data) {
-                                                alert('修改失败')
-                                            }
-                                        }
-                                    })
-                                }
+                                update(event)
                             }
                         })
                     })
@@ -57,22 +35,20 @@ const pageData = {
                             const ele_self = event.target as Node
                             const ele_parent = ele_self.parentNode
                             const id = (ele_self as HTMLElement).getAttribute('data-id')
-                            if (confirm('确定要删除该条记录？')) {
-                                new Ajax({
-                                    url: 'delete_keyword.php',
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded'
-                                    },
-                                    content: 'id=' + id,
-                                    success(data) {
-                                        if (!data) {
-                                            alert('删除失败')
-                                        }
-                                        (ele_parent as HTMLElement).remove()
+                            new Ajax({
+                                url: 'delete_keyword.php',
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                content: 'id=' + id,
+                                success(data) {
+                                    if (!data) {
+                                        alert('删除失败')
                                     }
-                                })
-                            }
+                                    (ele_parent as HTMLElement).remove()
+                                }
+                            })
                         })
                     })
                 }
@@ -80,7 +56,9 @@ const pageData = {
             const ele_addKeyword = dom.querySelector('.addKeyword') as HTMLButtonElement
             ele_addKeyword.addEventListener('click', function () {
                 const ele_firstLineDelete = dom.querySelector('.delete') as HTMLButtonElement
-                if (!ele_firstLineDelete.getAttribute('data-id')) {
+                if (ele_firstLineDelete && !ele_firstLineDelete.getAttribute('data-id')) {
+                    const parentNode2 = ele_firstLineDelete.parentNode
+                    parentNode2?.querySelector('td')?.focus()
                     return
                 }
                 const ele_tbody = dom.querySelector('tbody') as HTMLTableSectionElement
@@ -89,8 +67,21 @@ const pageData = {
                 <td contenteditable="true" class="keyword"></td>
                 <td contenteditable="true" class="reply"></td>
                 <td class="text-nowrap text-danger user-select-none delete" role="button">删除</td>`
-                ele_tbody.insertBefore(newEle, ele_tbody.children[0]);
-                (newEle.querySelector('td') as HTMLTableCellElement).focus()
+                ele_tbody.insertBefore(newEle, ele_tbody.children[0])
+                const eles = dom.querySelectorAll<HTMLTableCellElement>('td[contenteditable]')
+                eles.forEach(element => {
+                    element.addEventListener('keydown', function (event: KeyboardEvent) {
+                        if (event.keyCode == 13 && !event.shiftKey) {
+                            event.preventDefault()
+                        }
+                    })
+                    element.addEventListener('keyup', function (event) {
+                        if (event.keyCode == 13 && !event.shiftKey) {
+                            update(event)
+                        }
+                    })
+                })
+                newEle.querySelector('td')?.focus()
             })
         }
     }
@@ -101,3 +92,32 @@ poncon.setPage('home', function (target, dom) {
     }
 })
 poncon.start()
+
+/**
+ * 关键词回复列表，保存记录
+ */
+function update(event: KeyboardEvent) {
+    const ele_self = event.target as HTMLElement
+    const id = ele_self.getAttribute('data-id')
+    const ele_keyword = ele_self.parentElement?.querySelector('td.keyword') as HTMLElement
+    const ele_reply = ele_self.parentElement?.querySelector('td.reply') as HTMLElement
+    const keyword = ele_keyword?.innerText
+    const reply = ele_reply?.innerText
+    new Ajax({
+        url: 'update_keyword.php',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        content: 'keyword=' + encodeURIComponent(keyword)
+            + '&reply=' + encodeURIComponent(reply)
+            + '&id=' + id,
+        success(data) {
+            if (!data) {
+                alert('修改失败')
+            } else {
+                location.reload()
+            }
+        }
+    })
+}
