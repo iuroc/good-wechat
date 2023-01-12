@@ -103,6 +103,10 @@ function update(event: KeyboardEvent) {
     const ele_reply = ele_self.parentElement?.querySelector('td.reply') as HTMLElement
     const keyword = ele_keyword?.innerText
     const reply = ele_reply?.innerText
+    if (!keyword || !reply) {
+        alert('请填写完整')
+        return
+    }
     new Ajax({
         url: 'update_keyword.php',
         method: 'POST',

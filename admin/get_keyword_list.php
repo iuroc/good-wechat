@@ -17,7 +17,7 @@ class Get_keyword_list
     public function get_list()
     {
         $table_keyword = $this->wechat->mysql_config['table']['keyword'];
-        $sql = "SELECT * FROM `$table_keyword`";
+        $sql = "SELECT * FROM `$table_keyword` ORDER BY `id` DESC";
         $result = mysqli_query($this->wechat->conn, $sql);
         $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
         $html = $this->make_html($data);

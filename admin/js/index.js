@@ -103,6 +103,10 @@ function update(event) {
     var ele_reply = (_b = ele_self.parentElement) === null || _b === void 0 ? void 0 : _b.querySelector('td.reply');
     var keyword = ele_keyword === null || ele_keyword === void 0 ? void 0 : ele_keyword.innerText;
     var reply = ele_reply === null || ele_reply === void 0 ? void 0 : ele_reply.innerText;
+    if (!keyword || !reply) {
+        alert('请填写完整');
+        return;
+    }
     new ajax_1["default"]({
         url: 'update_keyword.php',
         method: 'POST',
