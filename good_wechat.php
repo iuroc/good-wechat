@@ -7,19 +7,21 @@
 class Good_wechat
 {
     /** 解析后的输入数据 */
-    public array $input_data;
+    private array $input_data;
     /** 接收到的收件人 */
-    public string $to_user_name;
+    private string $to_user_name;
     /** 接收到的发件人 */
-    public string $from_user_name;
+    private string $from_user_name;
     /** 接收到的消息类型 */
-    public string $msg_type;
+    private string $msg_type;
     /** 接收到的消息内容 */
-    public string $content;
+    private string $content;
     /** 配置信息 */
-    public array $config;
+    private array $config;
     /** MySQL 配置信息 */
-    public array $mysql_config;
+    private array $mysql_config;
+    /** 微信公众号配置的 token */
+    private string $token;
     /** 数据库连接 */
     public mysqli $conn;
     /**
@@ -31,7 +33,7 @@ class Good_wechat
         $this->init_db();
     }
     /** 载入配置信息 */
-    public function load_config(array $config_path)
+    private function load_config(array $config_path)
     {
         $path = $config_path[0] ?? 'config.json';
         $this->config = json_decode(file_get_contents($path), true);
@@ -60,12 +62,15 @@ class Good_wechat
         $this->load_input_data();
         $this->match_keyword();
     }
+    /** 校验 Token
+     * @link [接入指南__微信开发文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html)
+     */
     private function check_signature()
     {
         $signature = $_GET['signature'] ?? '';
         $timestamp = $_GET['timestamp'] ?? '';
         $nonce = $_GET['nonce'] ?? '';
-        $token = 'good_wechat';
+        $token = $this->token ?? '';
         $tmpArr = array($token, $timestamp, $nonce);
         sort($tmpArr, SORT_STRING);
         $tmpStr = implode($tmpArr);
@@ -76,9 +81,7 @@ class Good_wechat
             return false;
         }
     }
-    /**
-     * 匹配关键词并回复
-     */
+    /** 匹配关键词并回复 */
     public function match_keyword()
     {
         $table_keyword = $this->mysql_config['table']['keyword'];
@@ -90,19 +93,26 @@ class Good_wechat
             $this->send_text($reply);
         }
     }
+    public function set_token(string $token)
+    {
+        $this->token = $token;
+    }
     /** 获取并解析输入数据 */
     private function load_input_data()
     {
         $input_text = file_get_contents('php://input');
-        if ($this->check_signature()) {
+        if ($this->token && $this->check_signature() && $_GET['echostr'] ?? '') {
             echo $_GET['echostr'] ?? '';
             die();
+        } elseif ($_GET['echostr'] ?? '') {
+            echo '校验失败';
+            die();
         }
-        $this->input_data = (array)simplexml_load_string($input_text, null, LIBXML_NOCDATA);
-        if (!$this->input_data[0]) {
+        if (!$input_text) {
             echo '输入为空';
             die();
         }
+        $this->input_data = (array)simplexml_load_string($input_text, null, LIBXML_NOCDATA);
         $this->to_user_name = $this->input_data['ToUserName'];
         $this->from_user_name = $this->input_data['FromUserName'];
         $this->msg_type = $this->input_data['MsgType'];
