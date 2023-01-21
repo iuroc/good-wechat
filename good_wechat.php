@@ -2,6 +2,7 @@
 
 /** Good-Wechat 微信公众号机器人
  * @author 欧阳鹏
+ * @version 1.1.0
  */
 class Good_wechat
 {
@@ -59,6 +60,22 @@ class Good_wechat
         $this->load_input_data();
         $this->match_keyword();
     }
+    private function check_signature()
+    {
+        $signature = $_GET['signature'] ?? '';
+        $timestamp = $_GET['timestamp'] ?? '';
+        $nonce = $_GET['nonce'] ?? '';
+        $token = 'good_wechat';
+        $tmpArr = array($token, $timestamp, $nonce);
+        sort($tmpArr, SORT_STRING);
+        $tmpStr = implode($tmpArr);
+        $tmpStr = sha1($tmpStr);
+        if ($tmpStr == $signature) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     /**
      * 匹配关键词并回复
      */
@@ -77,10 +94,15 @@ class Good_wechat
     private function load_input_data()
     {
         $input_text = file_get_contents('php://input');
-        if (!$input_text) {
-            die('输入为空');
+        if ($this->check_signature()) {
+            echo $_GET['echostr'] ?? '';
+            die();
         }
         $this->input_data = (array)simplexml_load_string($input_text, null, LIBXML_NOCDATA);
+        if (!$this->input_data[0]) {
+            echo '输入为空';
+            die();
+        }
         $this->to_user_name = $this->input_data['ToUserName'];
         $this->from_user_name = $this->input_data['FromUserName'];
         $this->msg_type = $this->input_data['MsgType'];
