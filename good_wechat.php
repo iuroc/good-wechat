@@ -93,7 +93,7 @@ class Good_wechat
             $this->send_text($reply);
         }
     }
-    /** 设置 token 值 */
+    /** 设置 token 值，如果不设置，则不校验 */
     public function set_token(string $token)
     {
         $this->token = $token;
@@ -101,13 +101,14 @@ class Good_wechat
     /** 获取并解析输入数据 */
     private function load_input_data()
     {
+        $this->token = $this->token ?? '';
         $input_text = file_get_contents('php://input');
-        if ($this->check_signature()) {
+        if ($this->token && $this->check_signature()) {
             if ($_GET['echostr'] ?? '') {
                 echo $_GET['echostr'] ?? '';
                 die();
             }
-        } else {
+        } elseif ($this->token) {
             echo '校验失败';
             die();
         }

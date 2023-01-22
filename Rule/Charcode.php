@@ -1,8 +1,6 @@
 <?php
 
 namespace Rule;
-
-require('./IRule.php');
 /**
  * 验证码发送
  */

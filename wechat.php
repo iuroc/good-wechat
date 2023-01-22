@@ -5,6 +5,7 @@
  */
 
 require('./good_wechat.php');
+require('./Rule/IRule.php');
 require('./Rule/Charcode.php');
 $wechat = new Good_wechat();
 $wechat->set_token('gyfweyatgfyredgdfgfd');
