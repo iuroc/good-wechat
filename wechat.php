@@ -5,12 +5,15 @@
  */
 
 require('./good_wechat.php');
-
+require('./Rule/Charcode.php');
 $wechat = new Good_wechat();
-$wechat->set_token('akfgjwgergt');
+$wechat->set_token('gyfweyatgfyredgdfgfd');
 $wechat->start();
-$wechat->add_rule('/.*?music.*?/', function ($args) {
+$wechat->add_rule('/.*?music.*?/', function () {
     return '你输入的内容包含了 music 哦';
+});
+$wechat->add_rule('/^\s*验证码\s*$/', function ($args) {
+    return \Rule\Charcode::run($args);
 });
 // 如果没有匹配结果，将直接回复下面的内容
 $wechat->send_text('系统升级中，敬请谅解
