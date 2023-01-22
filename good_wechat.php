@@ -102,10 +102,12 @@ class Good_wechat
     private function load_input_data()
     {
         $input_text = file_get_contents('php://input');
-        if ($this->token && $this->check_signature() && $_GET['echostr'] ?? '') {
-            echo $_GET['echostr'] ?? '';
-            die();
-        } elseif ($_GET['echostr'] ?? '') {
+        if ($this->check_signature()) {
+            if ($_GET['echostr'] ?? '') {
+                echo $_GET['echostr'] ?? '';
+                die();
+            }
+        } else {
             echo '校验失败';
             die();
         }
@@ -113,6 +115,7 @@ class Good_wechat
             echo '输入为空';
             die();
         }
+
         $this->input_data = (array)simplexml_load_string($input_text, null, LIBXML_NOCDATA);
         $this->to_user_name = $this->input_data['ToUserName'];
         $this->from_user_name = $this->input_data['FromUserName'];
