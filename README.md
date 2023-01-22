@@ -32,13 +32,19 @@
    $wechat = new Good_wechat();
    ```
 
-2. 启动机器人
+2. 设置 token
+
+  ```php
+  $wechat->set_token('xxxxxxx');
+  ```
+
+3. 启动机器人
 
    ```php
    $wechat->start();
    ```
 
-3. 增加自定义规则
+4. 增加自定义规则
 
    * [add_rule 方法说明](#add_rule)
 
@@ -48,7 +54,7 @@
    });
    ```
 
-4. 默认回复内容
+5. 默认回复内容
 
    ```php
    $wechat->send_text('没有匹配到结果哦');
@@ -57,6 +63,10 @@
 ## API 文档
 
 ### 方法
+
+#### set_token
+
+* 用于设置 `token`，`token` 值和微信公众平台的配置保持一致
 
 #### start
 
