@@ -93,6 +93,7 @@ class Good_wechat
             $this->send_text($reply);
         }
     }
+    /** 设置 token 值 */
     public function set_token(string $token)
     {
         $this->token = $token;
