@@ -11,7 +11,7 @@ class Ver_code implements IRule
     public static string $ver_code;
     /** 机器人实例 */
     public static \Good_wechat $wechat;
-    public static function run(?array $args = [], ?\Good_wechat $wechat): string
+    public static function run(\Good_wechat $wechat, array $args): string
     {
         self::$table = $wechat->mysql_config['table']['ver_code'];
         self::init_table();

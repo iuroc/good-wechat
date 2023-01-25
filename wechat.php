@@ -13,8 +13,8 @@ $wechat->start();
 $wechat->add_rule('/.*?music.*?/', function () {
     return '你输入的内容包含了 music 哦';
 });
-$wechat->add_rule('/^\s*验证码\s*$/', function ($args, $wechat) {
-    return \Rule\Ver_code::run($args, $wechat);
+$wechat->add_rule('/^\s*验证码\s*$/', function ($wechat, $args) {
+    return \Rule\Ver_code::run($wechat, $args);
 });
 // 如果没有匹配结果，将直接回复下面的内容
 $wechat->send_text('系统升级中，敬请谅解

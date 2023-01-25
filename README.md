@@ -89,10 +89,10 @@
 
   * `pattern`​：正则表达式，用于匹配指令类型（用户消息使用空格分割，取第一项为指令类型）
 
-  * `callback`​：回调函数，包含一个数组参数 `$args`​，代表指令参数列表
+  * `callback`​：回调函数，包含机器人实例和数组参数 `$args`​，代表指令参数列表
 
     ```php
-    function ($args) {}
+    function (\Good_wechat $wechat, array $args) {}
     ```
 
 #### send_text

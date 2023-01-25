@@ -2,7 +2,7 @@
 
 /** Good-Wechat 微信公众号机器人
  * @author 欧阳鹏
- * @version 1.1.0
+ * @version 1.1.1
  */
 class Good_wechat
 {
@@ -160,7 +160,7 @@ class Good_wechat
     {
         $args = preg_split('/\s+/', $this->content);
         if (preg_match($pattern, $args[0] ?? '')) {
-            $callback_text = call_user_func($callback, $args, $this);
+            $callback_text = call_user_func($callback, $this, $args);
             if ($callback_text) {
                 $this->send_text($callback_text);
             }
