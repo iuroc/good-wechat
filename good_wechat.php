@@ -8,9 +8,9 @@ class Good_wechat
 {
     /** 解析后的输入数据 */
     public array $input_data;
-    /** 接收到的收件人 */
+    /** 收件人，即机器人 */
     public string $to_user_name;
-    /** 接收到的发件人 */
+    /** 发件人，即微信用户ID */
     public string $from_user_name;
     /** 接收到的消息类型 */
     public string $msg_type;
