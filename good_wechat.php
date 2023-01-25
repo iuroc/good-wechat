@@ -7,21 +7,21 @@
 class Good_wechat
 {
     /** 解析后的输入数据 */
-    private array $input_data;
+    public array $input_data;
     /** 接收到的收件人 */
-    private string $to_user_name;
+    public string $to_user_name;
     /** 接收到的发件人 */
-    private string $from_user_name;
+    public string $from_user_name;
     /** 接收到的消息类型 */
-    private string $msg_type;
+    public string $msg_type;
     /** 接收到的消息内容 */
-    private string $content;
+    public string $content;
     /** 配置信息 */
-    private array $config;
+    public array $config;
     /** MySQL 配置信息 */
-    private array $mysql_config;
+    public array $mysql_config;
     /** 微信公众号配置的 token */
-    private string $token;
+    public string $token;
     /** 数据库连接 */
     public mysqli $conn;
     /**
@@ -33,7 +33,7 @@ class Good_wechat
         $this->init_db();
     }
     /** 载入配置信息 */
-    private function load_config(array $config_path)
+    public function load_config(array $config_path)
     {
         $path = $config_path[0] ?? 'config.json';
         $this->config = json_decode(file_get_contents($path), true);
@@ -65,7 +65,7 @@ class Good_wechat
     /** 校验 Token
      * @link [接入指南__微信开发文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html)
      */
-    private function check_signature()
+    public function check_signature()
     {
         $signature = $_GET['signature'] ?? '';
         $timestamp = $_GET['timestamp'] ?? '';
@@ -99,7 +99,7 @@ class Good_wechat
         $this->token = $token;
     }
     /** 获取并解析输入数据 */
-    private function load_input_data()
+    public function load_input_data()
     {
         $this->token = $this->token ?? '';
         $input_text = file_get_contents('php://input');
@@ -160,7 +160,7 @@ class Good_wechat
     {
         $args = preg_split('/\s+/', $this->content);
         if (preg_match($pattern, $args[0] ?? '')) {
-            $callback_text = call_user_func($callback, $args);
+            $callback_text = call_user_func($callback, $args, $this);
             if ($callback_text) {
                 $this->send_text($callback_text);
             }

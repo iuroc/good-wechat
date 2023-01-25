@@ -5,7 +5,8 @@
         "password": "12345678",
         "database": "ponconsoft",
         "table": {
-            "keyword": "gw_keyword"
+            "keyword": "gw_keyword",
+            "ver_code": "gw_ver_code"
         }
     }
 }
