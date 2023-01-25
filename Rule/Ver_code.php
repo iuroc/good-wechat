@@ -13,11 +13,12 @@ class Ver_code implements IRule
     public static \Good_wechat $wechat;
     public static function run(\Good_wechat $wechat, array $args): string
     {
+        self::$wechat = $wechat;
         self::$table = $wechat->mysql_config['table']['ver_code'];
         self::init_table();
         self::delete_old_ver_code();
         self::add();
-        return self::$ver_code;
+        return '验证码：' . self::$ver_code;
     }
     /** 删除旧的验证码 */
     public static function delete_old_ver_code()
@@ -35,7 +36,8 @@ class Ver_code implements IRule
             `id` INT NOT NULL AUTO_INCREMENT,
             `ver_code` VARCHAR(20) COMMENT '验证码',
             `user_id` VARCHAR(50) COMMENT '微信用户ID',
-            `create_time` DATETIME DATATIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' 
+            `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            PRIMARY KEY (`id`)
         )";
         mysqli_query(self::$wechat->conn, $sql);
     }
