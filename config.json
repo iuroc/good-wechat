@@ -6,7 +6,8 @@
         "database": "ponconsoft",
         "table": {
             "keyword": "gw_keyword",
-            "ver_code": "gw_ver_code"
+            "ver_code": "gw_ver_code",
+            "login_app": "gw_login_app"
         }
     }
 }
