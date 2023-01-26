@@ -33,11 +33,10 @@ class Ver_code implements IRule
     {
         $table = self::$table;
         $sql = "CREATE TABLE IF NOT EXISTS `$table` (
-            `id` INT NOT NULL AUTO_INCREMENT,
             `ver_code` VARCHAR(20) COMMENT '验证码',
             `user_id` VARCHAR(50) COMMENT '微信用户ID',
             `expiry_date` INT COMMENT '过期时间',
-            PRIMARY KEY (`id`)
+            PRIMARY KEY (`ver_code`)
         )";
         mysqli_query(self::$wechat->conn, $sql);
     }
@@ -45,12 +44,24 @@ class Ver_code implements IRule
     public static function add()
     {
         $table = self::$table;
-        $ver_code = rand(100000, 999999);
+        $ver_code = self::make_ver_code();
         // 过期时间
         $user_id = self::$wechat->from_user_name;
         $expiry_date = time() + 5 * 60;
         $sql = "INSERT INTO `$table` (`ver_code`, `user_id`, `expiry_date`) VALUES ('$ver_code', '$user_id', $expiry_date)";
         mysqli_query(self::$wechat->conn, $sql);
         self::$ver_code = $ver_code;
+    }
+    /** 生成可用验证码 */
+    public static function make_ver_code()
+    {
+        $table = self::$table;
+        $ver_code = rand(100000, 999999);
+        $sql = "SELECT * FROM `$table` WHERE `ver_code` = '$ver_code'";
+        $result = mysqli_query(self::$wechat->conn, $sql);
+        if (mysqli_num_rows($result) > 0) {
+            return self::make_ver_code();
+        }
+        return $ver_code;
     }
 }
