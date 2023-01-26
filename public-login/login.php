@@ -22,6 +22,7 @@ class Login
     public function __construct()
     {
         $this->wechat = new \Good_wechat('../config.json');
+        $this->init_db();
         $this->check_app_id();
         $this->check_ver_code();
     }
@@ -34,7 +35,7 @@ class Login
             die();
         }
         $table = $this->wechat->mysql_config['table']['login_app'];
-        $sql = "SELECT * FROM `$table` WHERE `app_id` = {$this->app_id}";
+        $sql = "SELECT * FROM `$table` WHERE `app_id` = '{$this->app_id}'";
         $result = mysqli_query($this->wechat->conn, $sql);
         if (mysqli_num_rows($result) == 0) {
             echo 'app_id 不存在';
@@ -57,7 +58,48 @@ class Login
             $this->error_msg = '验证码错误';
             return;
         }
+        $user_id = $data['user_id'];
         $this->delete_old_ver_code();
+        $this->add_token($user_id);
+        header('location: login.php?app_id=' . $this->app_id);
+    }
+    /**
+     * 生成 token
+     * @param string $user_id 用户ID
+     */
+    public function add_token(string $user_id)
+    {
+        $random_bytes = random_bytes(64);
+        $token = bin2hex($random_bytes);
+        $table = $this->wechat->mysql_config['table']['user_token'];
+    }
+    /** 初始化数据表 */
+    public function init_db()
+    {
+        $table = $this->wechat->mysql_config['table']['login_app'];
+        $sql = "CREATE TABLE IF NOT EXISTS `$table` (
+            `app_id` VARCHAR(255) PRIMARY KEY COMMENT '应用ID',
+            `callback_url` VARCHAR(255) COMMENT '回调接口URL',
+            `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '应用创建时间'
+        )";
+        mysqli_query($this->wechat->conn, $sql);
+
+        $table = $this->wechat->mysql_config['table']['user_token'];
+        $sql = "CREATE TABLE IF NOT EXISTS `$table` (
+            `user_id` varchar(255) NOT NULL COMMENT '用户ID',
+            `token` varchar(255) NULL DEFAULT NULL COMMENT '令牌',
+            `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `expiry_date` int NULL DEFAULT NULL COMMENT '过期时间',
+            `app_id` varchar(255) NULL DEFAULT NULL COMMENT '应用ID',
+            PRIMARY KEY (`user_id`) USING BTREE,
+            INDEX `app_id`(`app_id` ASC) USING BTREE,
+            CONSTRAINT `gw_user_token_ibfk_1` FOREIGN KEY (`app_id`) REFERENCES `gw_login_app` (`app_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+        )";
+        mysqli_query($this->wechat->conn, $sql);
+    }
+    /** 向回调接口返回 token */
+    public function callback_token()
+    {
     }
     /** 删除过期验证码 */
     public function delete_old_ver_code()

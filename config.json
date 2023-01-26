@@ -7,7 +7,8 @@
         "table": {
             "keyword": "gw_keyword",
             "ver_code": "gw_ver_code",
-            "login_app": "gw_login_app"
+            "login_app": "gw_login_app",
+            "user_token": "gw_user_token"
         }
     }
 }
