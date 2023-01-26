@@ -17,11 +17,20 @@ class Login
     public string $app_id;
     /** 验证码 */
     public string $ver_code;
+    /** 回调接口 URL */
+    public string $callback_url;
     /** 错误提示 */
     public string $error_msg = '';
+    /** user_token 表名 */
+    public string $table_user_token;
+    /** 用户 ID */
+    public string $user_id;
+    /** Token 过期时间（秒） 机器人端 Token 保留时间 第三方需要在有效期内完成校验 */
+    public int $expiry = 5 * 60;
     public function __construct()
     {
         $this->wechat = new \Good_wechat('../config.json');
+        $this->table_user_token = $this->wechat->mysql_config['table']['user_token'];
         $this->init_db();
         $this->check_app_id();
         $this->check_ver_code();
@@ -41,6 +50,8 @@ class Login
             echo 'app_id 不存在';
             die();
         }
+        $data = mysqli_fetch_assoc($result);
+        $this->callback_url = $data['callback_url'];
     }
     /** 校验验证码 */
     public function check_ver_code()
@@ -58,20 +69,42 @@ class Login
             $this->error_msg = '验证码错误';
             return;
         }
-        $user_id = $data['user_id'];
+        $this->user_id = $data['user_id'];
         $this->delete_old_ver_code();
-        $this->add_token($user_id);
-        header('location: login.php?app_id=' . $this->app_id);
+        $this->add_token();
     }
-    /**
-     * 生成 token
-     * @param string $user_id 用户ID
-     */
-    public function add_token(string $user_id)
+    /** 创建 token 记录*/
+    public function add_token()
     {
         $random_bytes = random_bytes(64);
         $token = bin2hex($random_bytes);
-        $table = $this->wechat->mysql_config['table']['user_token'];
+        if ($this->if_user_id_exists()) {
+            $this->update_token($token);
+            return;
+        }
+        $expiry_date = time() + $this->expiry;
+        $sql = "INSERT INTO `{$this->table_user_token}` (`user_id`, `token`, `expiry_date`, `app_id`)
+                VALUES ('{$this->user_id}', '$token', $expiry_date, '{$this->app_id}')";
+        mysqli_query($this->wechat->conn, $sql);
+        $this->callback_token($token);
+    }
+    /**
+     * 更新 Token 记录
+     * @param string $token 生成的 Token 值
+     */
+    public function update_token(string $token)
+    {
+        $expiry_date = time() + $this->expiry;
+        $sql = "UPDATE `{$this->table_user_token}` SET `token` = '$token', `expiry_date` = $expiry_date WHERE `user_id` = '{$this->user_id}' AND `app_id` = '{$this->app_id}'";
+        mysqli_query($this->wechat->conn, $sql);
+        $this->callback_token($token);
+    }
+    /** 判断用户 Token 记录是否存在 */
+    public function if_user_id_exists(): bool
+    {
+        $sql = "SELECT * FROM `{$this->table_user_token}` WHERE `user_id` = '{$this->user_id}' AND `app_id` = '{$this->app_id}'";
+        $result = mysqli_query($this->wechat->conn, $sql);
+        return mysqli_num_rows($result) > 0;
     }
     /** 初始化数据表 */
     public function init_db()
@@ -87,19 +120,28 @@ class Login
         $table = $this->wechat->mysql_config['table']['user_token'];
         $sql = "CREATE TABLE IF NOT EXISTS `$table` (
             `user_id` varchar(255) NOT NULL COMMENT '用户ID',
-            `token` varchar(255) NULL DEFAULT NULL COMMENT '令牌',
-            `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-            `expiry_date` int NULL DEFAULT NULL COMMENT '过期时间',
-            `app_id` varchar(255) NULL DEFAULT NULL COMMENT '应用ID',
-            PRIMARY KEY (`user_id`) USING BTREE,
+            `token` varchar(255) NOT NULL COMMENT '令牌',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `expiry_date` int NOT NULL COMMENT '过期时间',
+            `app_id` varchar(255) NOT NULL COMMENT '应用ID',
+            PRIMARY KEY (`user_id`, `app_id`) USING BTREE,
             INDEX `app_id`(`app_id` ASC) USING BTREE,
             CONSTRAINT `gw_user_token_ibfk_1` FOREIGN KEY (`app_id`) REFERENCES `gw_login_app` (`app_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
         )";
         mysqli_query($this->wechat->conn, $sql);
     }
-    /** 向回调接口返回 token */
-    public function callback_token()
+    /**
+     * 向回调接口返回 token
+     * @param string $token Token 值
+     */
+    public function callback_token(string $token)
     {
+        if (!filter_var($this->callback_url, FILTER_VALIDATE_URL)) {
+            echo '回调接口异常';
+            die();
+        }
+        $url = $this->callback_url . '?token=' . $token;
+        header('location:' . $url);
     }
     /** 删除过期验证码 */
     public function delete_old_ver_code()
@@ -184,7 +226,7 @@ $login = new Login();
         <img src="./img/qrcode.jpg" alt="二维码" style="width: 300px; max-width: 100%;" draggable="false">
         <div style="font-size: 20px; margin-bottom: 20px;">&nbsp;&nbsp;请扫码 <b>发送</b> 关键词【<b style="color: red;">验证码</b>】</div>
         <form class="input-group" method="post" action="?app_id=<?php echo $login->app_id ?>">
-            <input type="text" name="ver_code" class="ver_code" placeholder="请输入验证码" required>
+            <input type="text" name="ver_code" class="ver_code" placeholder="请输入验证码" required autofocus>
             <input type="submit" class="login" value="登录">
         </form>
         <?php if ($login->error_msg) : ?>
