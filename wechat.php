@@ -8,7 +8,7 @@ require('./good_wechat.php');
 require('./Rule/IRule.php');
 require('./Rule/Ver_code.php');
 $wechat = new Good_wechat();
-$wechat->set_token('gyfweyatgfyredgdfgfd');
+// $wechat->set_token('gyfweyatgfyredgdfgfd');
 $wechat->start();
 $wechat->add_rule('/.*?music.*?/', function () {
     return '你输入的内容包含了 music 哦';

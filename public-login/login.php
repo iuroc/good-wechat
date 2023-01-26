@@ -49,17 +49,23 @@ class Login
             return;
         }
         $table = $this->wechat->mysql_config['table']['ver_code'];
-        $sql = "SELECT * FROM `$table` WHERE `ver_code` = '{$this->ver_code}'";
+        $time = time();
+        $sql = "SELECT * FROM `$table` WHERE `ver_code` = '{$this->ver_code}' AND `expiry_date` > $time";
         $result = mysqli_query($this->wechat->conn, $sql);
         $data = mysqli_fetch_array($result, MYSQLI_ASSOC);
         if (!$data) {
             $this->error_msg = '验证码错误';
             return;
         }
+        $this->delete_old_ver_code();
     }
     /** 删除过期验证码 */
     public function delete_old_ver_code()
     {
+        $table = $this->wechat->mysql_config['table']['ver_code'];
+        $time = time();
+        $sql = "DELETE FROM `$table` WHERE `ver_code` = '{$this->ver_code}' OR `expiry_date` < $time";
+        mysqli_query($this->wechat->conn, $sql);
     }
 }
 $login = new Login();

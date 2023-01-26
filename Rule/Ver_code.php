@@ -36,7 +36,7 @@ class Ver_code implements IRule
             `id` INT NOT NULL AUTO_INCREMENT,
             `ver_code` VARCHAR(20) COMMENT '验证码',
             `user_id` VARCHAR(50) COMMENT '微信用户ID',
-            `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `expiry_date` INT COMMENT '过期时间',
             PRIMARY KEY (`id`)
         )";
         mysqli_query(self::$wechat->conn, $sql);
@@ -46,8 +46,10 @@ class Ver_code implements IRule
     {
         $table = self::$table;
         $ver_code = rand(100000, 999999);
+        // 过期时间
         $user_id = self::$wechat->from_user_name;
-        $sql = "INSERT INTO `$table` (`ver_code`, `user_id`) VALUES ('$ver_code', '$user_id')";
+        $expiry_date = time() + 5 * 60;
+        $sql = "INSERT INTO `$table` (`ver_code`, `user_id`, `expiry_date`) VALUES ('$ver_code', '$user_id', $expiry_date)";
         mysqli_query(self::$wechat->conn, $sql);
         self::$ver_code = $ver_code;
     }

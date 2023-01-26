@@ -1,6 +1,6 @@
 <?php
-
-/** Good-Wechat 微信公众号机器人
+/**
+ * Good-Wechat 微信公众号机器人
  * @author 欧阳鹏
  * @version 1.1.1
  */
@@ -167,3 +167,4 @@ class Good_wechat
         }
     }
 }
+date_default_timezone_set('Asia/Shanghai');
