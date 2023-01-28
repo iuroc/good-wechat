@@ -1,5 +1,7 @@
 <?php
 
+use function PHPSTORM_META\type;
+
 /**
  * 回调接口
  */
@@ -22,7 +24,7 @@ class Callback
             echo 'token 值不能为空';
             die();
         }
-        $this->load_config(['../../../config.json']);
+        $this->load_config(['../../config.json']);
         $this->init_db();
         $this->check_token();
     }
@@ -54,7 +56,7 @@ class Callback
     public function check_token()
     {
         // 机器人端的校验URL 以 http:// 开头
-        $check_url = 'http://localhost/public-login/check_token.php';
+        $check_url = 'http://api.apee.top/wechat/public/ponconsoft/good-wechat/public-login/check_token.php';
         $result = file_get_contents($check_url . '?token=' . $this->token);
         $data = json_decode($result, true);
         $this->user_id = $data['user_id'] ?? '';
@@ -63,8 +65,8 @@ class Callback
             die();
         }
         $this->add_token();
-        setcookie('user-token', $this->token);
-        setcookie('user-id', $this->user_id);
+        setcookie('user-token', $this->token, time() + 30 * 24 * 60 * 60, '/');
+        setcookie('user-id', $this->user_id, time() + 30 * 24 * 60 * 60, '/');
         header('location: ./');
     }
     /** 增加第三方 Token 记录 */
