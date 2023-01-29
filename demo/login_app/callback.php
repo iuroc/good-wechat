@@ -59,7 +59,7 @@ class Callback
         $data = json_decode($result, true);
         $this->user_id = $data['user_id'] ?? '';
         if (!$this->user_id) {
-            echo 'token 校验失败';
+            echo 'token 联网校验失败';
             die();
         }
         $this->add_token();
@@ -70,7 +70,9 @@ class Callback
     /** 增加第三方 Token 记录 */
     public function add_token()
     {
-        // $sql = "INSERT INTO `test_user_token`"
+        // $expiry_date = time() + 30 * 24 * 60 * 60;
+        // $sql = "INSERT INTO `test_user_token` VALUES ('{$this->user_id}', '{$this->token}', '$expiry_date')";
+        // mysqli_query($this->conn, $sql);
     }
 }
 
