@@ -1,0 +1,12 @@
+{
+    "mysql": {
+        "host": "localhost",
+        "username": "root",
+        "password": "12345678",
+        "database": "ponconsoft",
+        "table": {
+            "user_token": "test_user_token"
+        }
+    },
+    "app_id": "3"
+}

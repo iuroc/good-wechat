@@ -1,5 +1,5 @@
 <?php
-
+require_once('./init_db.php');
 /**
  * 回调接口
  */
@@ -9,12 +9,10 @@ class Callback
     public string $token = '';
     /** 用户 ID */
     public string $user_id = '';
-    /** 配置信息 */
-    public array $config;
-    /** MySQL 数据库配置信息 */
-    public array $mysql_config;
-    /** 数据库连接 */
-    public mysqli $conn;
+    /** 数据表名 */
+    public string $table_name;
+    /** 过期时间戳 */
+    public int $expiry;
     public function __construct()
     {
         $this->token = $_GET['token'] ?? '';
@@ -22,33 +20,16 @@ class Callback
             echo 'token 值不能为空';
             die();
         }
-        $this->load_config(['../../config.json']);
-        $this->init_db();
+        $this->table_name = Init_db::$table_name;
         $this->check_token();
+        $this->delete_old_token();
     }
-    /** 载入配置信息 */
-    public function load_config(array $config_path)
+    /** 删除过期 Token */
+    public function delete_old_token()
     {
-        $path = $config_path[0] ?? 'config.json';
-        $this->config = json_decode(file_get_contents($path), true);
-        $this->mysql_config = $this->config['mysql'];
-    }
-    /** 初始化第三方 Token 表 */
-    public function init_db()
-    {
-        $sql = "CREATE TABLE IF NOT EXISTS `test_user_token` (
-            `user_id` VARCHAR(50) NOT NULL COMMENT '用户ID',
-            `token` VARCHAR(255) NOT NULL COMMENT 'Token 值',
-            `expiry_date` INT COMMENT '过期时间',
-            PRIMARY KEY (`user_id`)
-        )";
-        $this->conn = mysqli_connect(
-            $this->mysql_config['host'],
-            $this->mysql_config['username'],
-            $this->mysql_config['password'],
-            $this->mysql_config['database']
-        );
-        mysqli_query($this->conn, $sql);
+        $time = time();
+        $sql = "DELETE FROM `{$this->table_name}` WHERE `expiry_date` < $time";
+        mysqli_query(Init_db::$conn, $sql);
     }
     /** 远程校验 Token */
     public function check_token()
@@ -70,9 +51,20 @@ class Callback
     /** 增加第三方 Token 记录 */
     public function add_token()
     {
-        // $expiry_date = time() + 30 * 24 * 60 * 60;
-        // $sql = "INSERT INTO `test_user_token` VALUES ('{$this->user_id}', '{$this->token}', '$expiry_date')";
-        // mysqli_query($this->conn, $sql);
+        $this->expiry = time() + 30 * 24 * 60 * 60;
+        if ($this->user_id_exists()) {
+            $sql = "UPDATE `{$this->table_name}` SET `token` = '{$this->token}', `expiry_date` = '{$this->expiry}' WHERE `user_id` = '{$this->user_id}'";
+        } else {
+            $sql = "INSERT INTO `{$this->table_name}` VALUES ('{$this->user_id}', '{$this->token}', '{$this->expiry}')";
+        }
+        mysqli_query(Init_db::$conn, $sql);
+    }
+    /** 判断用户记录是否存在 */
+    public function user_id_exists()
+    {
+        $sql = "SELECT NULL FROM `{$this->table_name}` WHERE `user_id` = '{$this->user_id}'";
+        $result = mysqli_query(Init_db::$conn, $sql);
+        return mysqli_num_rows($result) > 0;
     }
 }
 
