@@ -16,6 +16,9 @@ $wechat->add_rule('/.*?music.*?/', function () {
 $wechat->add_rule('/^\s*验证码\s*$/', function ($wechat, $args) {
     return \Rule\Ver_code::run($wechat, $args);
 });
+$wechat->add_event_rule('subscribe', function ($wechat) {
+    return '欢迎关注';
+});
 // 如果没有匹配结果，将直接回复下面的内容
 $wechat->send_text('系统升级中，敬请谅解
 系统已设置部分保留关键词，你可以试试这些关键词

@@ -15,6 +15,8 @@ class Good_wechat
     public string $from_user_name;
     /** 接收到的消息类型 */
     public string $msg_type;
+    /** 事件类型 */
+    public string $event_type;
     /** 接收到的消息内容 */
     public string $content;
     /** 配置信息 */
@@ -61,16 +63,9 @@ class Good_wechat
     public function start()
     {
         $this->load_input_data();
-        $this->match_event();
         $this->match_keyword();
     }
-    /** 响应事件推送 */
-    public function match_event()
-    {
-        if ($this->msg_type == 'event') {
-            $this->send_text('事件啊啊');
-        }
-    }
+
     /** 校验 Token
      * @link [接入指南__微信开发文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html)
      */
@@ -131,6 +126,7 @@ class Good_wechat
         $this->from_user_name = $this->input_data['FromUserName'];
         $this->msg_type = $this->input_data['MsgType'];
         $this->content = $this->input_data['Content'] ?? '';
+        $this->event_type = $this->input_data['Event'] ?? '';
         if ($this->msg_type == 'text' && !$this->content) {
             $this->send_text('亲，请输入内容哦');
         }
@@ -170,6 +166,16 @@ class Good_wechat
         $args = preg_split('/\s+/', $this->content);
         if (preg_match($pattern, $args[0] ?? '')) {
             $callback_text = call_user_func($callback, $this, $args);
+            if ($callback_text) {
+                $this->send_text($callback_text);
+            }
+        }
+    }
+    /** 增加事件规则 */
+    public function add_event_rule(string $event_type, callable $callback)
+    {
+        if ($this->event_type == $event_type) {
+            $callback_text = call_user_func($callback, $this);
             if ($callback_text) {
                 $this->send_text($callback_text);
             }
