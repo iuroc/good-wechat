@@ -150,6 +150,41 @@ class Good_wechat
         echo $out_text;
         die();
     }
+    public function send_news(string $title, string $url)
+    {
+        $out_text = $this->parse_out('
+        <xml>
+            <ToUserName><![CDATA[' . $this->from_user_name . ']]></ToUserName>
+            <FromUserName><![CDATA[' . $this->to_user_name . ']]></FromUserName>
+            <CreateTime>' . time() . '</CreateTime>
+            <MsgType><![CDATA[news]]></MsgType>
+            <ArticleCount>1</ArticleCount>
+            <Articles>
+            <item>
+                <Title><![CDATA[' . $title . ']]></Title>
+                <Description><![CDATA[' . $title . ']]></Description>
+                <Url><![CDATA[' . $url . ']]></Url>
+            </item>
+            </Articles>
+        </xml>');
+        echo $out_text;
+        die();
+    }
+    public function send_image(string $image_id)
+    {
+        $out_text = $this->parse_out('
+        <xml>
+            <ToUserName><![CDATA[' . $this->from_user_name . ']]></ToUserName>
+            <FromUserName><![CDATA[' . $this->to_user_name . ']]></FromUserName>
+            <CreateTime>' . time() . '</CreateTime>
+            <MsgType><![CDATA[image]]></MsgType>
+            <Image>
+                <MediaId><![CDATA[' . $image_id . ']]></MediaId>
+            </Image>
+        </xml>');
+        echo $out_text;
+        die();
+    }
     /** 处理输出文本，去除首尾空白，去除每行开头空白
      * @param string $out_text 待发送内容
      */
