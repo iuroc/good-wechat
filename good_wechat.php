@@ -88,6 +88,9 @@ class Good_wechat
     /** 匹配关键词并回复 */
     public function match_keyword()
     {
+        if ($this->msg_type != 'text') {
+            return;
+        }
         $table_keyword = $this->mysql_config['table']['keyword'];
         $keyword = mysqli_real_escape_string($this->conn, $this->content);
         $sql = "SELECT `reply` FROM `$table_keyword` WHERE `keyword` = '$keyword'";
@@ -163,6 +166,9 @@ class Good_wechat
      */
     public function add_rule(string $pattern, callable $callback)
     {
+        if ($this->msg_type != 'text') {
+            return;
+        }
         $args = preg_split('/\s+/', $this->content);
         if (preg_match($pattern, $args[0] ?? '')) {
             $callback_text = call_user_func($callback, $this, $args);
