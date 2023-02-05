@@ -150,8 +150,15 @@ class Good_wechat
         echo $out_text;
         die();
     }
-    public function send_news(string $title, string $url)
+    /**
+     * 发送消息卡片
+     * @param string $title 卡片标题
+     * @param string $sub_title 卡片子标题
+     * @param string $url 卡片链接地址
+     */
+    public function send_news(string $title, string $sub_title, string $url)
     {
+        if (!$sub_title) $sub_title = $title;
         $out_text = $this->parse_out('
         <xml>
             <ToUserName><![CDATA[' . $this->from_user_name . ']]></ToUserName>
@@ -162,7 +169,7 @@ class Good_wechat
             <Articles>
             <item>
                 <Title><![CDATA[' . $title . ']]></Title>
-                <Description><![CDATA[' . $title . ']]></Description>
+                <Description><![CDATA[' . $sub_title . ']]></Description>
                 <Url><![CDATA[' . $url . ']]></Url>
             </item>
             </Articles>
@@ -170,7 +177,11 @@ class Good_wechat
         echo $out_text;
         die();
     }
-    public function send_image(string $image_id)
+    /**
+     * 发送图片消息
+     * @param string $media_id 图片 ID
+     */
+    public function send_image(string $media_id)
     {
         $out_text = $this->parse_out('
         <xml>
@@ -179,7 +190,7 @@ class Good_wechat
             <CreateTime>' . time() . '</CreateTime>
             <MsgType><![CDATA[image]]></MsgType>
             <Image>
-                <MediaId><![CDATA[' . $image_id . ']]></MediaId>
+                <MediaId><![CDATA[' . $media_id . ']]></MediaId>
             </Image>
         </xml>');
         echo $out_text;

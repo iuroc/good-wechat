@@ -27,16 +27,16 @@
 
 1. 导入 `Wechat_good`​ 类并实例化
 
-   ```php
-   require('./good_wechat.php');
-   $wechat = new Good_wechat();
-   ```
+    ```php
+    require('./good_wechat.php');
+    $wechat = new Good_wechat();
+    ```
 
 2. 设置 token
 
-  ```php
-  $wechat->set_token('xxxxxxx');
-  ```
+    ```php
+    $wechat->set_token('xxxxxxx');
+    ```
 
 3. 启动机器人
 
@@ -49,7 +49,7 @@
    * [add_rule 方法说明](#add_rule)
 
    ```php
-   $wechat->add_rule('/.*?music.*?/', function ($args) {
+   $wechat->add_rule('/.*?music.*?/', function (\Good_wechat $wechat, $args) {
        return '你好，我是回复内容';
    });
    ```
@@ -101,6 +101,10 @@
 
   * 向用户回复内容
   * 该方法只会调用一次，调用完成后程序终止，即用户会收到第一次调用该方法时发送的内容
+
+#### send_news
+
+* 说明
 
 * 语法
 

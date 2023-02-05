@@ -13,7 +13,7 @@ $wechat->start();
 $wechat->add_rule('/.*?music.*?/', function () {
     return '你输入的内容包含了 music 哦';
 });
-$wechat->add_rule('/^\s*验证码\s*$/', function ($wechat, $args) {
+$wechat->add_rule('/^\s*验证码\s*$/', function (\Good_wechat $wechat, $args) {
     return \Rule\Ver_code::run($wechat, $args);
 });
 $wechat->add_event_rule('subscribe', function ($wechat) {
