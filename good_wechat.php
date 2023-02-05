@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Good-Wechat 微信公众号机器人
  * @author 欧阳鹏
@@ -60,7 +61,15 @@ class Good_wechat
     public function start()
     {
         $this->load_input_data();
+        $this->match_event();
         $this->match_keyword();
+    }
+    /** 响应事件推送 */
+    public function match_event()
+    {
+        if ($this->msg_type == 'event') {
+            $this->send_text('事件啊啊');
+        }
     }
     /** 校验 Token
      * @link [接入指南__微信开发文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html)
@@ -121,8 +130,8 @@ class Good_wechat
         $this->to_user_name = $this->input_data['ToUserName'];
         $this->from_user_name = $this->input_data['FromUserName'];
         $this->msg_type = $this->input_data['MsgType'];
-        $this->content = $this->input_data['Content'];
-        if (!$this->content) {
+        $this->content = $this->input_data['Content'] ?? '';
+        if ($this->msg_type == 'text' && !$this->content) {
             $this->send_text('亲，请输入内容哦');
         }
     }
